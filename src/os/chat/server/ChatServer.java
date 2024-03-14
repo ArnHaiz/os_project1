@@ -1,8 +1,13 @@
 package os.chat.server;
 
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Vector;
 
 import os.chat.client.CommandsFromServer;
+import os.chat.client.CommandsFromWindow;
 
 /**
  * Each instance of this class is a server for one room.
@@ -18,6 +23,8 @@ public class ChatServer implements ChatServerInterface {
 	
 	private String roomName;
 	private Vector<CommandsFromServer> registeredClients;
+
+	Registry registry;
 	
   /**
    * Constructs and initializes the chat room before registering it to the RMI
@@ -27,10 +34,16 @@ public class ChatServer implements ChatServerInterface {
 	public ChatServer(String roomName){
 		this.roomName = roomName;
 		registeredClients = new Vector<CommandsFromServer>();
-		
-		/*
-		 * TODO register the ChatServer to the RMI registry
-		 */
+
+		try {
+			ChatServerInterface stub = (ChatServerInterface) UnicastRemoteObject.exportObject(this, 0);
+			registry = LocateRegistry.getRegistry();
+			registry.rebind(roomName, stub);
+		} catch (RemoteException e) {
+			System.out.println("Cannot locate registry");
+			e.printStackTrace();
+		}
+		System.out.println("ChatServer was created");
 	}
 
 	/**
@@ -60,6 +73,9 @@ public class ChatServer implements ChatServerInterface {
 		/*
 		 * TODO register the client
 		 */
+
+		registry.rebind();
+		registeredClients.add(client);
 	}
 
 	/**

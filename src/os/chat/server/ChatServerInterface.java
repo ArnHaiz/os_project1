@@ -2,12 +2,14 @@ package os.chat.server;
 
 import os.chat.client.CommandsFromServer;
 
+import java.rmi.Remote;
+
 /**
  * This interface is the set of commands that can be called remotely for the
  * {@link ChatServer}.
  * @since Q2
  */
-public interface ChatServerInterface {
+public interface ChatServerInterface extends Remote {
 
 	/**
 	 * receives a message from a client and send it to all subscribed clients

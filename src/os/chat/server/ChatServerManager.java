@@ -38,23 +38,24 @@ public class ChatServerManager implements ChatServerManagerInterface {
 	 * the {@link ChatClient}.
 	 */
 	public ChatServerManager () {
+		chatRoomsList = new Vector<>();
+		chatRooms = new Vector<>();
 		
 		// initial: we create a single chat room and the corresponding ChatServer
 		chatRooms.add(new ChatServer("sports"));
 		chatRoomsList.add("sports");
-		
-		/*
-		 * TODO register the server manager object as a "ChatServerManager" on the RMI registry
-		 * so it can be called by clients.
-		 */
+
 		try {
-			ChatServer skeleton = (ChatServer) UnicastRemoteObject.exportObject((Remote) this, 0);
+			ChatServerManagerInterface stub = (ChatServerManagerInterface) UnicastRemoteObject.exportObject(this, 0);
 			registry = LocateRegistry.getRegistry();
-			registry.rebind("ChatServerManager", (Remote) skeleton);
+			registry.rebind("ChatServerManager", stub);
 
 		} catch (RemoteException e) {
+			System.out.println("Cannot export the object");
 			e.printStackTrace();
 		}
+
+		System.out.println("ChatServerManager was created");
 
 	}
 
@@ -63,7 +64,7 @@ public class ChatServerManager implements ChatServerManagerInterface {
      * singleton chat server manager instance if none was previously created.
      * @return a reference to the singleton chat server manager instance
      */
-    public static ChatServerManager getInstance() throws RemoteException {
+    public static ChatServerManager getInstance() {
 	if (instance == null)
 	    instance = new ChatServerManager();
 
@@ -94,6 +95,19 @@ public class ChatServerManager implements ChatServerManagerInterface {
 		 */
 		
 		return false;
-	}	
+	}
+
+	public static void main(String[] args) {
+		try {
+			LocateRegistry.createRegistry(1099);
+		} catch (RemoteException e) {
+			System.out.println("cannot create registry");
+			e.printStackTrace();
+		}
+
+		getInstance();
+
+		System.out.println("Registry was created");
+	}
 	
 }

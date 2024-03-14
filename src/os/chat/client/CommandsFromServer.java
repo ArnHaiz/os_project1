@@ -1,6 +1,7 @@
 package os.chat.client;
 
 
+import os.chat.server.ChatServer;
 
 /**
  * This is the interface between {@link ChatClient} and {@link ChatServer}.

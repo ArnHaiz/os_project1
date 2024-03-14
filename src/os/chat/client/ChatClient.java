@@ -2,6 +2,7 @@ package os.chat.client;
 
 
 import os.chat.server.ChatServer;
+import os.chat.server.ChatServerManagerInterface;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -31,14 +32,11 @@ public class ChatClient implements CommandsFromWindow,CommandsFromServer {
 	Registry registry;
 
 	/**
-	 * ChatServer we want to connect to
-	 */
-	ChatServer chatServer;
-
-	/**
 	 * The name of the server we want to connect to
 	 */
 	String serverLookUpName = "ChatServerManager";
+
+	ChatServerManagerInterface csm;
 	
   /**
    * Constructor for the <code>ChatClient</code>. Must perform the connection to the
@@ -53,20 +51,15 @@ public class ChatClient implements CommandsFromWindow,CommandsFromServer {
 		this.userName = userName;
 		
 		System.err.println("TODO: implement ChatClient constructor and connection to the server");
-		
-		/*
-		 * TODO implement constructor
-		 */
 
 		try {
 			registry = LocateRegistry.getRegistry();
-		} catch (RemoteException re) {
-			re.printStackTrace();
-		}
-		try {
-			chatServer = (ChatServer) registry.lookup(serverLookUpName);
-		} catch (RemoteException | NotBoundException e) {
+			csm = (ChatServerManagerInterface) registry.lookup(serverLookUpName);
+		} catch (RemoteException e) {
+			System.out.println("cannot locate registry");
 			e.printStackTrace();
+		} catch (NotBoundException e) {
+			System.out.println("Cannot look up for " + serverLookUpName);
 		}
 
 	}
@@ -104,15 +97,20 @@ public class ChatClient implements CommandsFromWindow,CommandsFromServer {
 
 		/*
 		 * TODO implement the method to receive a list of available chat rooms from the server.
-		 */		
-		
-		return null;
+		 */
+		try {
+			return csm.getRoomsList();
+		} catch (RemoteException e) {
+			System.out.println("cannot call ChatServerManager.getRoomList()");
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	/**
 	 * Join the chat room. Does not leave previously joined chat rooms. To
 	 * join a chat room we need to know only the chat room's name.
-	 * @param name the name (unique identifier) of the chat room
+	 * @param roomName the name (unique identifier) of the chat room
 	 * @return <code>true</code> if joining the chat room was successful,
 	 * <code>false</code> otherwise
 	 */
@@ -129,7 +127,7 @@ public class ChatClient implements CommandsFromWindow,CommandsFromServer {
 
 	/**
 	 * Leaves the chat room with the specified name
-	 * <code>roomName</code>. The operation has no effect if has not
+	 * <code>roomName</code>. The operation has no effect if it has not
 	 * previously joined the chat room.
 	 * @param roomName the name (unique identifier) of the chat room
 	 * @return <code>true</code> if leaving the chat room was successful,

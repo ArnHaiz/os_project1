@@ -1,11 +1,13 @@
 package os.chat.server;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Vector;
 
+import os.chat.client.ChatClient;
 import os.chat.client.CommandsFromServer;
 import os.chat.client.CommandsFromWindow;
 
@@ -23,7 +25,9 @@ public class ChatServer implements ChatServerInterface {
 	
 	private String roomName;
 	private Vector<CommandsFromServer> registeredClients;
+	private Vector<String> clientNames;
 
+	private ChatServerManagerInterface csm;
 	Registry registry;
 	
   /**
@@ -32,17 +36,23 @@ public class ChatServer implements ChatServerInterface {
    * @param roomName the name of the chat room
    */
 	public ChatServer(String roomName){
-		this.roomName = roomName;
+		this.roomName = "room_" + roomName;
 		registeredClients = new Vector<CommandsFromServer>();
+		clientNames = new Vector<>();
 
 		try {
 			ChatServerInterface stub = (ChatServerInterface) UnicastRemoteObject.exportObject(this, 0);
 			registry = LocateRegistry.getRegistry();
-			registry.rebind(roomName, stub);
+			registry.rebind(this.roomName, stub);
+			csm = (ChatServerManagerInterface) registry.lookup("ChatServerManager");
 		} catch (RemoteException e) {
 			System.out.println("Cannot locate registry");
 			e.printStackTrace();
+		} catch (NotBoundException e) {
+			System.out.println("Cannot find ChatServerManager");
+			e.printStackTrace();
 		}
+
 		System.out.println("ChatServer was created");
 	}
 
@@ -53,12 +63,14 @@ public class ChatServer implements ChatServerInterface {
 	 * @param publisher the client from which the message originates
 	 */	
 	public void publish(String message, String publisher) {
-		
-		System.err.println("TODO: publish is not implemented");
-		
-		/*
-		 * TODO send the message to all registered clients
-		 */
+		message = publisher + " : " + message;
+		for(int i = 0; i < registeredClients.size(); i++) {
+			try {
+				registeredClients.get(i).receiveMsg(roomName, message);
+			} catch (RemoteException e) {
+				System.out.println("Cannot connect to client " + clientNames.get(i));
+			}
+		}
 	}
 
 	/**
@@ -67,16 +79,14 @@ public class ChatServer implements ChatServerInterface {
 	 * registry
 	 */
 	public void register(CommandsFromServer client) {
-		
-		System.err.println("TODO: register is not implemented");
-		
-		/*
-		 * TODO register the client
-		 */
-
-		registry.rebind();
-		registeredClients.add(client);
-	}
+		try {
+			registeredClients.add(client);
+			clientNames.add(client.getUserName());
+		} catch (RemoteException e) {
+			System.out.println("Cannot connect to client");
+			e.printStackTrace();
+		}
+    }
 
 	/**
 	 * Unregisters a client from the chat room.
@@ -84,12 +94,13 @@ public class ChatServer implements ChatServerInterface {
 	 * registry
 	 */
 	public void unregister(CommandsFromServer client) {
-		
-		System.err.println("TODO: unregister is not implemented");
-		
-		/*
-		 * TODO unregister the client
-		 */
-	}
+		try {
+			registeredClients.remove(client);
+			clientNames.remove(client.getUserName());
+		} catch (RemoteException e) {
+			System.out.println("Cannot unregister client properly");
+			e.printStackTrace();
+		}
+    }
 	
 }

@@ -40,10 +40,6 @@ public class ChatServerManager implements ChatServerManagerInterface {
 	public ChatServerManager () {
 		chatRoomsList = new Vector<>();
 		chatRooms = new Vector<>();
-		
-		// initial: we create a single chat room and the corresponding ChatServer
-		chatRooms.add(new ChatServer("sports"));
-		chatRoomsList.add("sports");
 
 		try {
 			ChatServerManagerInterface stub = (ChatServerManagerInterface) UnicastRemoteObject.exportObject(this, 0);
@@ -56,6 +52,10 @@ public class ChatServerManager implements ChatServerManagerInterface {
 		}
 
 		System.out.println("ChatServerManager was created");
+		
+		// initial: we create a single chat room and the corresponding ChatServer
+		chatRooms.add(new ChatServer("sports"));
+		chatRoomsList.add("room_sports");
 
 	}
 

@@ -2,8 +2,6 @@ package os.chat.server;
 
 import os.chat.client.ChatClient;
 
-import java.rmi.AccessException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -45,7 +43,7 @@ public class ChatServerManager implements ChatServerManagerInterface {
 
 		try {
 			ChatServerManagerInterface stub = (ChatServerManagerInterface) UnicastRemoteObject.exportObject(this, 0);
-			registry = LocateRegistry.getRegistry();
+			registry = LocateRegistry.getRegistry("192.168.38.13", 1099);
 			registry.rebind("ChatServerManager", stub);
 
 		} catch (RemoteException e) {
@@ -55,7 +53,6 @@ public class ChatServerManager implements ChatServerManagerInterface {
 
 		System.out.println("ChatServerManager was created");
 		
-		// initial: we create a single chat room and the corresponding ChatServer
 		chatRooms.add(new ChatServer("sports"));
 		chatRoomsList.add("room_sports");
 

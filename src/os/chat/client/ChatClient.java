@@ -55,7 +55,7 @@ public class ChatClient implements CommandsFromWindow,CommandsFromServer {
 		this.userName = userName;
 
 		try {
-			registry = LocateRegistry.getRegistry();
+			registry = LocateRegistry.getRegistry("192.168.38.13", 1099);
 			csm = (ChatServerManagerInterface) registry.lookup(serverLookUpName);
 		} catch (RemoteException e) {
 			System.out.println("cannot locate registry");

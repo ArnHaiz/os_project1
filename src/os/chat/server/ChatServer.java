@@ -22,14 +22,14 @@ import os.chat.client.CommandsFromWindow;
  * for creating and adding new rooms.
  */
 public class ChatServer implements ChatServerInterface {
-	
+
 	private String roomName;
 	private Vector<CommandsFromServer> registeredClients;
 	private Vector<String> clientNames;
 
 	private ChatServerManagerInterface csm;
 	Registry registry;
-	
+
   /**
    * Constructs and initializes the chat room before registering it to the RMI
    * registry.
@@ -61,14 +61,16 @@ public class ChatServer implements ChatServerInterface {
 	 * chat room) a message send from a client.
 	 * @param message the message to propagate
 	 * @param publisher the client from which the message originates
-	 */	
+	 */
 	public void publish(String message, String publisher) {
-		message = publisher + " : " + message;
+		String messageWiPub = publisher + " : " + message;
 		for(int i = 0; i < registeredClients.size(); i++) {
 			try {
-				registeredClients.get(i).receiveMsg(roomName, message);
+				registeredClients.get(i).receiveMsg(roomName, messageWiPub);
 			} catch (RemoteException e) {
 				System.out.println("Cannot connect to client " + clientNames.get(i));
+					registeredClients.remove(i);
+					clientNames.remove(i);
 			}
 		}
 	}

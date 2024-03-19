@@ -1,5 +1,7 @@
 package os.chat.server;
 
+import os.chat.client.ChatClient;
+
 import java.rmi.AccessException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -87,12 +89,11 @@ public class ChatServerManager implements ChatServerManagerInterface {
 	 * <code>false</code> otherwise.
 	 */
 	public boolean createRoom(String roomName) {
-		
-		System.err.println("server manager method createRoom not implemented.");
-		
-		/*
-		 * TODO add the code to create a new room
-		 */
+		if (!roomName.isEmpty() && !chatRoomsList.contains(roomName)) {
+			chatRooms.add(new ChatServer(roomName));
+			chatRoomsList.add("room_".concat(roomName));
+			return true;
+		}
 		
 		return false;
 	}

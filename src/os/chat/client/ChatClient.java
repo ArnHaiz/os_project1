@@ -6,6 +6,7 @@ import os.chat.server.ChatServerInterface;
 import os.chat.server.ChatServerManagerInterface;
 
 import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -90,9 +91,8 @@ public class ChatClient implements CommandsFromWindow,CommandsFromServer {
 			((ChatServerInterface) registry.lookup(roomName)).publish(message, userName);
 		} catch (RemoteException e) {
 			System.out.println("Cannot connect to " + roomName);
-			e.printStackTrace();
 		} catch (NotBoundException e) {
-			System.out.println("ChatServer not connected");
+			System.out.println("ChatServer not connected to registry");
 			e.printStackTrace();
         }
     }
@@ -164,13 +164,14 @@ public class ChatClient implements CommandsFromWindow,CommandsFromServer {
      * <code>false</code> otherwise.
      */
 	public boolean createNewRoom(String roomName) {
-		
-		System.err.println("TODO: createNewRoom is not implemented.");
+		try {
+			csm.createRoom(roomName);
+			return true;
+		} catch (RemoteException e) {
+			System.out.println("Cannot connect to ChatServerManager");
+			e.printStackTrace();
+		}
 
-		/*
-		 * TODO implement the method to ask the server to create a new room (second part of the assignment only).
-		 */		
-		
 		return false;
 	}
 

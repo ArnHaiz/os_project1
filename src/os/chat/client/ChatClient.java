@@ -36,6 +36,11 @@ public class ChatClient implements CommandsFromWindow,CommandsFromServer {
 	Registry registry;
 
 	/**
+	 * ip of the registry to connect to
+	 */
+	String registryIP = "134.21.162.235";
+
+	/**
 	 * The name of the server we want to connect to
 	 */
 	String serverLookUpName = "ChatServerManager";
@@ -55,7 +60,7 @@ public class ChatClient implements CommandsFromWindow,CommandsFromServer {
 		this.userName = userName;
 
 		try {
-			registry = LocateRegistry.getRegistry("192.168.38.13", 1099);
+			registry = LocateRegistry.getRegistry(registryIP, 1099);
 			csm = (ChatServerManagerInterface) registry.lookup(serverLookUpName);
 		} catch (RemoteException e) {
 			System.out.println("cannot locate registry");

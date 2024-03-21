@@ -23,11 +23,29 @@ import os.chat.client.CommandsFromWindow;
  */
 public class ChatServer implements ChatServerInterface {
 
+	/**
+	 * The name of the room
+	 */
 	private String roomName;
+
+	/**
+	 * Vector of the clients that are connected to the room
+	 */
 	private Vector<CommandsFromServer> registeredClients;
+
+	/**
+	 * Vector of the clients names
+	 */
 	private Vector<String> clientNames;
 
+	/**
+	 * The ChatServerManager instance bound to the registry
+	 */
 	private ChatServerManagerInterface csm;
+
+	/**
+	 * the rmi registry
+	 */
 	Registry registry;
 
   /**
